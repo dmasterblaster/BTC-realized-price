@@ -6,7 +6,8 @@ from pathlib import Path
 import pandas as pd
 import requests
 
-API_URL = "https://api.bitcoinmagazinepro.com/metrics/realized-price"
+# NOTE: if this ever 404s, try removing the /v1 part, but this is the pattern BMP uses.
+API_URL = "https://api.bitcoinmagazinepro.com/v1/metrics/realized-price"
 
 
 def main():
@@ -17,32 +18,40 @@ def main():
     }
 
     resp = requests.get(API_URL, headers=headers, timeout=30)
+
+    # Debug info that will show up in the GitHub Actions log
+    print("BMP API status code:", resp.status_code)
     resp.raise_for_status()
-
     csv_text = resp.text
+    print("First 200 characters of response:")
+    print(csv_text[:200])
 
-    df = pd.read_csv(
-        io.StringIO(csv_text),
-        index_col=0,
-    )
+    if not csv_text.strip():
+        raise RuntimeError("Empty response from BMP API")
 
-    dates = df.index.astype(str).tolist()
-    first_col = df.columns[0]
-    realized_price = df[first_col].astype(float).tolist()
+    # Parse CSV
+    df = pd.read_csv(io.StringIO(csv_text), index_col=0)
 
-    data = {
-        "dates": dates,
-        "realized_price": realized_price,
-    }
+    if df.empty or len(df.columns) == 0:
+        raise RuntimeError(f"Parsed empty DataFrame from CSV. Columns: {list(df.columns)}")
 
-    out_dir = Path("data")
-    out_dir.mkdir(exist_ok=True)
-    out_path = out_dir / "realized-price.json"
+    # Take the last column as the realized price series (most BMP metrics have the value last)
+    value_col = df.columns[-1]
+    series = df[value_col].dropna()
 
-    with out_path.open("w") as f:
-        json.dump(data, f)
+    dates = series.index.astype(str).tolist()
+    values = series.astype(float).tolist()
 
-    print(f"Wrote {len(dates)} rows to {out_path} using column '{first_col}'")
+    data = [
+        {"date": d, "value": v}
+        for d, v in zip(dates, values)
+    ]
+
+    out_path = Path("data/realized-price.json")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(data, indent=2))
+
+    print(f"Wrote {len(data)} points to {out_path}")
 
 
 if __name__ == "__main__":
