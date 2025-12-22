@@ -1,150 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bitcoin Realized Price (Auto-Updating)</title>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+  <!-- Plotly -->
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
   <style>
     body {
       margin: 0;
-      padding: 20px;
+      font-family: Arial, sans-serif;
       background-color: #111827;
-      color: #f9fafb;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #e5e7eb;
     }
     h1 {
-      margin-bottom: 10px;
-    }
-    #status {
-      margin-bottom: 10px;
-      font-size: 14px;
-      color: #9ca3af;
+      font-size: 28px;
+      margin: 20px;
     }
     #chart {
       width: 100%;
-      height: 80vh;
+      height: 90vh;
+    }
+    #error {
+      margin: 20px;
+      color: #f87171;
+      font-size: 16px;
     }
   </style>
 </head>
+
 <body>
   <h1>Bitcoin Realized Price (Auto-Updating)</h1>
-  <div id="status">Loading data…</div>
+  <div id="error"></div>
   <div id="chart"></div>
 
   <script>
-    async function loadAndPlot() {
-      const statusEl = document.getElementById("status");
+    async function loadChart() {
+      const errorDiv = document.getElementById('error');
+
+      function showError(msg) {
+        if (errorDiv) {
+          errorDiv.textContent = 'Error loading data: ' + msg;
+        } else {
+          console.error(msg);
+        }
+      }
+
       try {
-        const resp = await fetch("./data/realized-price.json", {
-          cache: "no-store"
-        });
-
-        if (!resp.ok) {
-          throw new Error(`HTTP ${resp.status} when fetching JSON`);
+        const response = await fetch('data/realized-price.json?cache=' + Date.now());
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status + ' ' + response.statusText);
         }
 
-        const json = await resp.json();
-        console.log("Raw JSON:", json);
+        const json = await response.json();
 
-        let records;
+        // JSON is an array of { date, value }
+        let rows = Array.isArray(json) ? json : null;
 
-        // Case 1: already an array of records
-        if (Array.isArray(json)) {
-          records = json;
-        }
-        // Case 2: { data: [...] }
-        else if (Array.isArray(json.data)) {
-          records = json.data;
-        }
-        // Case 3: object of column arrays: { Date: [...], realized_price: [...] }
-        else {
-          const keys = Object.keys(json);
-          const dateKey = keys.find(k => k.toLowerCase().includes("date"));
-          const rpKey = keys.find(k => k.toLowerCase().includes("realized"));
-
-          if (!dateKey || !rpKey) {
-            throw new Error(
-              "Could not infer date/realized price columns from JSON keys: " + keys.join(", ")
-            );
-          }
-
-          const datesArr = json[dateKey];
-          const rpArr = json[rpKey];
-
-          if (!Array.isArray(datesArr) || !Array.isArray(rpArr)) {
-            throw new Error("Inferred columns are not arrays");
-          }
-          if (datesArr.length !== rpArr.length) {
-            console.warn("Date and realized arrays have different lengths");
-          }
-
-          records = datesArr.map((d, i) => ({
-            [dateKey]: d,
-            [rpKey]: rpArr[i]
-          }));
+        // Fallback if wrapped in an object
+        if (!rows && json && typeof json === 'object') {
+          const arrKey = Object.keys(json).find(k => Array.isArray(json[k]));
+          if (arrKey) rows = json[arrKey];
         }
 
-        // Extract x and y using flexible key detection
-        const xs = [];
-        const ys = [];
-
-        for (const row of records) {
-          const rowKeys = Object.keys(row);
-          const dateKey =
-            rowKeys.find(k => k.toLowerCase().includes("date")) || "Date";
-          const rpKey =
-            rowKeys.find(k => k.toLowerCase().includes("realized")) ||
-            "realized_price";
-
-          const d = row[dateKey];
-          const r = row[rpKey];
-
-          if (d != null && r != null && r !== "") {
-            xs.push(d);
-            ys.push(Number(r));
-          }
+        if (!Array.isArray(rows)) {
+          throw new Error('Unexpected JSON structure');
         }
 
-        console.log("Parsed", xs.length, "points");
+        const dates = [];
+        const prices = [];
 
-        if (xs.length === 0) {
-          throw new Error("No valid data points found after parsing JSON");
+        for (const row of rows) {
+          const dateStr = row.date;
+          let value = row.value;
+
+          if (!dateStr || value === undefined || value === null) continue;
+
+          value = Number(value);
+          if (Number.isNaN(value)) continue;
+
+          dates.push(dateStr);
+          prices.push(value);
+        }
+
+        if (!dates.length) {
+          throw new Error(
+            'No valid data points found. Parsed ' +
+            rows.length +
+            ' rows but 0 usable points.'
+          );
         }
 
         const trace = {
-          x: xs,
-          y: ys,
-          mode: "lines",
-          name: "Realized Price",
+          x: dates,
+          y: prices,
+          mode: 'lines',
+          line: { width: 2 },
+          name: 'Realized Price'
         };
 
         const layout = {
-          xaxis: {
-            title: "Date",
-            type: "date",
-            showgrid: true,
-            gridcolor: "#374151",
+          title: {
+            text: 'Bitcoin Realized Price (Auto-Updating)',
+            font: { size: 24 }
           },
-          yaxis: {
-            title: "Realized Price (USD)",
-            showgrid: true,
-            gridcolor: "#374151",
-          },
-          margin: { t: 40, r: 20, b: 50, l: 60 },
-          plot_bgcolor: "#111827",
-          paper_bgcolor: "#111827",
-          font: { color: "#e5e7eb" },
+          xaxis: { title: 'Date', type: 'date' },
+          yaxis: { title: 'Realized Price (USD)' },
+          margin: { l: 60, r: 20, t: 60, b: 60 },
+          paper_bgcolor: '#111827',
+          plot_bgcolor: '#111827',
+          font: { color: '#e5e7eb' }
         };
 
-        statusEl.textContent = "Data loaded successfully.";
-        Plotly.newPlot("chart", [trace], layout, { responsive: true });
+        Plotly.newPlot('chart', [trace], layout, { responsive: true });
+        errorDiv.textContent = '';
+
       } catch (err) {
-        console.error(err);
-        statusEl.textContent = "Error loading data: " + err.message;
+        showError(err.message || String(err));
       }
     }
 
-    loadAndPlot();
+    document.addEventListener('DOMContentLoaded', loadChart);
   </script>
 </body>
 </html>
