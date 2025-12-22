@@ -3,86 +3,148 @@
 <head>
   <meta charset="UTF-8" />
   <title>Bitcoin Realized Price (Auto-Updating)</title>
-  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <style>
     body {
       margin: 0;
-      padding: 0;
-      background-color: #111;
-      color: #eee;
+      padding: 20px;
+      background-color: #111827;
+      color: #f9fafb;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     h1 {
-      font-size: 24px;
-      padding: 16px;
+      margin-bottom: 10px;
+    }
+    #status {
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: #9ca3af;
     }
     #chart {
-      width: 100vw;
-      height: calc(100vh - 60px);
+      width: 100%;
+      height: 80vh;
     }
   </style>
 </head>
 <body>
   <h1>Bitcoin Realized Price (Auto-Updating)</h1>
+  <div id="status">Loading data…</div>
   <div id="chart"></div>
 
   <script>
-    (async function () {
+    async function loadAndPlot() {
+      const statusEl = document.getElementById("status");
       try {
-        // Load the JSON produced by the GitHub Action
-        const resp = await fetch("./data/realized-price.json");
+        const resp = await fetch("./data/realized-price.json", {
+          cache: "no-store"
+        });
+
         if (!resp.ok) {
-          console.error("Failed to fetch JSON:", resp.status, resp.statusText);
-          return;
+          throw new Error(`HTTP ${resp.status} when fetching JSON`);
         }
 
-        const data = await resp.json();
-        console.log("Loaded rows:", data.length, "sample:", data[0]);
+        const json = await resp.json();
+        console.log("Raw JSON:", json);
 
-        if (!Array.isArray(data) || data.length === 0) {
-          console.error("No data in JSON");
-          return;
+        let records;
+
+        // Case 1: already an array of records
+        if (Array.isArray(json)) {
+          records = json;
+        }
+        // Case 2: { data: [...] }
+        else if (Array.isArray(json.data)) {
+          records = json.data;
+        }
+        // Case 3: object of column arrays: { Date: [...], realized_price: [...] }
+        else {
+          const keys = Object.keys(json);
+          const dateKey = keys.find(k => k.toLowerCase().includes("date"));
+          const rpKey = keys.find(k => k.toLowerCase().includes("realized"));
+
+          if (!dateKey || !rpKey) {
+            throw new Error(
+              "Could not infer date/realized price columns from JSON keys: " + keys.join(", ")
+            );
+          }
+
+          const datesArr = json[dateKey];
+          const rpArr = json[rpKey];
+
+          if (!Array.isArray(datesArr) || !Array.isArray(rpArr)) {
+            throw new Error("Inferred columns are not arrays");
+          }
+          if (datesArr.length !== rpArr.length) {
+            console.warn("Date and realized arrays have different lengths");
+          }
+
+          records = datesArr.map((d, i) => ({
+            [dateKey]: d,
+            [rpKey]: rpArr[i]
+          }));
         }
 
-        // Be flexible about key names (date vs Date, etc)
-        const dates = data.map(row => row.date || row.Date);
-        const prices = data.map(
-          row =>
-            row.realized_price ||
-            row.realizedPrice ||
-            row.price ||
-            row.Price
-        );
+        // Extract x and y using flexible key detection
+        const xs = [];
+        const ys = [];
 
-        console.log("Points to plot:", dates.length, prices.length);
+        for (const row of records) {
+          const rowKeys = Object.keys(row);
+          const dateKey =
+            rowKeys.find(k => k.toLowerCase().includes("date")) || "Date";
+          const rpKey =
+            rowKeys.find(k => k.toLowerCase().includes("realized")) ||
+            "realized_price";
+
+          const d = row[dateKey];
+          const r = row[rpKey];
+
+          if (d != null && r != null && r !== "") {
+            xs.push(d);
+            ys.push(Number(r));
+          }
+        }
+
+        console.log("Parsed", xs.length, "points");
+
+        if (xs.length === 0) {
+          throw new Error("No valid data points found after parsing JSON");
+        }
 
         const trace = {
-          x: dates,
-          y: prices,
+          x: xs,
+          y: ys,
           mode: "lines",
-          type: "scatter",
-          line: { width: 2 }
+          name: "Realized Price",
         };
 
         const layout = {
-          margin: { l: 60, r: 20, t: 20, b: 60 },
           xaxis: {
             title: "Date",
-            type: "date"
+            type: "date",
+            showgrid: true,
+            gridcolor: "#374151",
           },
           yaxis: {
-            title: "Realized Price (USD)"
+            title: "Realized Price (USD)",
+            showgrid: true,
+            gridcolor: "#374151",
           },
-          paper_bgcolor: "#111",
-          plot_bgcolor: "#111",
-          font: { color: "#eee" }
+          margin: { t: 40, r: 20, b: 50, l: 60 },
+          plot_bgcolor: "#111827",
+          paper_bgcolor: "#111827",
+          font: { color: "#e5e7eb" },
         };
 
+        statusEl.textContent = "Data loaded successfully.";
         Plotly.newPlot("chart", [trace], layout, { responsive: true });
       } catch (err) {
-        console.error("Error rendering chart:", err);
+        console.error(err);
+        statusEl.textContent = "Error loading data: " + err.message;
       }
-    })();
+    }
+
+    loadAndPlot();
   </script>
 </body>
 </html>
