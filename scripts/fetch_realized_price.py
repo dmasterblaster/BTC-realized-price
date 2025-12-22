@@ -6,8 +6,9 @@ from pathlib import Path
 import pandas as pd
 import requests
 
-# NOTE: if this ever 404s, try removing the /v1 part, but this is the pattern BMP uses.
-API_URL = "https://api.bitcoinmagazinepro.com/v1/metrics/realized-price"
+API_URL = "https://api.bitcoinmagazinepro.com/metrics/realized-price"
+# If this ever breaks, you can also try the v1 version:
+# API_URL = "https://api.bitcoinmagazinepro.com/v1/metrics/realized-price"
 
 
 def main():
@@ -18,26 +19,46 @@ def main():
     }
 
     resp = requests.get(API_URL, headers=headers, timeout=30)
-
-    # Debug info that will show up in the GitHub Actions log
     print("BMP API status code:", resp.status_code)
     resp.raise_for_status()
-    csv_text = resp.text
-    print("First 200 characters of response:")
-    print(csv_text[:200])
 
-    if not csv_text.strip():
+    raw_text = resp.text
+    print("First 200 characters of *raw* response:")
+    print(raw_text[:200])
+
+    if not raw_text.strip():
         raise RuntimeError("Empty response from BMP API")
 
-    # Parse CSV
-    df = pd.read_csv(io.StringIO(csv_text), index_col=0)
+    # The response is a quoted string with literal "\n" characters.
+    # Example: ",Date,Price,realized_price\n0,2010-08-17,..."
+    # 1) Strip surrounding quotes
+    csv_quoted = raw_text.strip()
+    if csv_quoted.startswith('"') and csv_quoted.endswith('"'):
+        csv_quoted = csv_quoted[1:-1]
+
+    # 2) Convert literal "\n" sequences into real newlines
+    csv_text = csv_quoted.replace("\\n", "\n")
+
+    print("First 200 characters after unquoting / replacing \\n:")
+    print(csv_text[:200])
+
+    # 3) Parse CSV
+    df = pd.read_csv(io.StringIO(csv_text))
 
     if df.empty or len(df.columns) == 0:
         raise RuntimeError(f"Parsed empty DataFrame from CSV. Columns: {list(df.columns)}")
 
-    # Take the last column as the realized price series (most BMP metrics have the value last)
-    value_col = df.columns[-1]
-    series = df[value_col].dropna()
+    print("Parsed columns:", list(df.columns))
+
+    # The first column is an unnamed index (0,1,2,...) because of the leading comma.
+    # The useful columns are "Date", "Price", "realized_price".
+    if "Date" not in df.columns or "realized_price" not in df.columns:
+        raise RuntimeError(f"Expected 'Date' and 'realized_price' columns, got {list(df.columns)}")
+
+    # Use Date as index
+    df = df.set_index("Date")
+
+    series = df["realized_price"].dropna()
 
     dates = series.index.astype(str).tolist()
     values = series.astype(float).tolist()
