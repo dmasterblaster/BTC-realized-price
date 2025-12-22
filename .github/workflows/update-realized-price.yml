@@ -1,5 +1,9 @@
 name: Update realized price data
 
+# 🔐 Give the GITHUB_TOKEN permission to push commits
+permissions:
+  contents: write
+
 on:
   schedule:
     - cron: "5 0 * * *"
@@ -32,7 +36,6 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          mkdir -p data
           git add data/realized-price.json
           git commit -m "Update realized price data" || echo "No changes to commit"
           git push
