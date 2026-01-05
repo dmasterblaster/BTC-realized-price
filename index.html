@@ -1,128 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bitcoin Realized Price (Auto-Updating)</title>
+  <meta charset="UTF-8" />
+  <title>Bitcoin Realized Price</title>
 
-  <!-- Plotly -->
-  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #111827;
-      color: #e5e7eb;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue",
+                   Arial, sans-serif;
+      background-color: #ffffff;
+      color: #111111;
     }
-    h1 {
-      font-size: 28px;
-      margin: 20px;
-    }
+
     #chart {
-      width: 100%;
-      height: 90vh;
+      width: 100vw;
+      height: 100vh;
     }
-    #error {
-      margin: 20px;
-      color: #f87171;
+
+    .error {
+      padding: 20px;
+      color: #b00020;
       font-size: 16px;
     }
   </style>
 </head>
-
 <body>
-  <h1>Bitcoin Realized Price (Auto-Updating)</h1>
-  <div id="error"></div>
-  <div id="chart"></div>
 
-  <script>
-    async function loadChart() {
-      const errorDiv = document.getElementById('error');
+<div id="chart"></div>
 
-      function showError(msg) {
-        if (errorDiv) {
-          errorDiv.textContent = 'Error loading data: ' + msg;
-        } else {
-          console.error(msg);
-        }
-      }
-
-      try {
-        const response = await fetch('data/realized-price.json?cache=' + Date.now());
-        if (!response.ok) {
-          throw new Error('HTTP ' + response.status + ' ' + response.statusText);
-        }
-
-        const json = await response.json();
-
-        // JSON is an array of { date, value }
-        let rows = Array.isArray(json) ? json : null;
-
-        // Fallback if wrapped in an object
-        if (!rows && json && typeof json === 'object') {
-          const arrKey = Object.keys(json).find(k => Array.isArray(json[k]));
-          if (arrKey) rows = json[arrKey];
-        }
-
-        if (!Array.isArray(rows)) {
-          throw new Error('Unexpected JSON structure');
-        }
-
-        const dates = [];
-        const prices = [];
-
-        for (const row of rows) {
-          const dateStr = row.date;
-          let value = row.value;
-
-          if (!dateStr || value === undefined || value === null) continue;
-
-          value = Number(value);
-          if (Number.isNaN(value)) continue;
-
-          dates.push(dateStr);
-          prices.push(value);
-        }
-
-        if (!dates.length) {
-          throw new Error(
-            'No valid data points found. Parsed ' +
-            rows.length +
-            ' rows but 0 usable points.'
-          );
-        }
-
-        const trace = {
-          x: dates,
-          y: prices,
-          mode: 'lines',
-          line: { width: 2 },
-          name: 'Realized Price'
-        };
-
-        const layout = {
-          title: {
-            text: 'Bitcoin Realized Price (Auto-Updating)',
-            font: { size: 24 }
-          },
-          xaxis: { title: 'Date', type: 'date' },
-          yaxis: { title: 'Realized Price (USD)' },
-          margin: { l: 60, r: 20, t: 60, b: 60 },
-          paper_bgcolor: '#111827',
-          plot_bgcolor: '#111827',
-          font: { color: '#e5e7eb' }
-        };
-
-        Plotly.newPlot('chart', [trace], layout, { responsive: true });
-        errorDiv.textContent = '';
-
-      } catch (err) {
-        showError(err.message || String(err));
-      }
+<script>
+async function loadChart() {
+  try {
+    const response = await fetch("data/realized-price.json", { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error("Failed to load JSON data");
     }
 
-    document.addEventListener('DOMContentLoaded', loadChart);
-  </script>
+    const data = await response.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      throw new Error("No valid data points found after parsing JSON");
+    }
+
+    const dates = data.map(d => d.date);
+    const values = data.map(d => d.value);
+
+    const trace = {
+      x: dates,
+      y: values,
+      type: "scatter",
+      mode: "lines",
+      line: {
+        color: "#1f77b4",
+        width: 2
+      },
+      hovertemplate: "$%{y:,.0f}<br>%{x}<extra></extra>"
+    };
+
+    const layout = {
+      title: {
+        text: "Bitcoin Realized Price",
+        x: 0.5,
+        xanchor: "center",
+        font: {
+          size: 22,
+          color: "#111111"
+        }
+      },
+
+      paper_bgcolor: "#ffffff",
+      plot_bgcolor: "#ffffff",
+
+      xaxis: {
+        title: "Date",
+        showgrid: true,
+        gridcolor: "#e6e6e6",
+        tickfont: { color: "#111111" },
+        titlefont: { color: "#111111" }
+      },
+
+      yaxis: {
+        title: "USD",
+        tickprefix: "$",
+        tickformat: ",",
+        showgrid: true,
+        gridcolor: "#e6e6e6",
+        tickfont: { color: "#111111" },
+        titlefont: { color: "#111111" }
+      },
+
+      margin: {
+        l: 80,
+        r: 40,
+        t: 80,
+        b: 60
+      }
+    };
+
+    Plotly.newPlot("chart", [trace], layout, {
+      responsive: true,
+      displaylogo: false
+    });
+
+  } catch (err) {
+    document.getElementById("chart").innerHTML =
+      `<div class="error">Error loading data: ${err.message}</div>`;
+  }
+}
+
+loadChart();
+</script>
+
 </body>
 </html>
