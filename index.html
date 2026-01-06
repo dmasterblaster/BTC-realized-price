@@ -30,41 +30,28 @@ function toNum(x){
   return Number.isFinite(n) ? n : null;
 }
 
-function pick(obj, keys){
-  for (const k of keys){
-    if (obj && Object.prototype.hasOwnProperty.call(obj, k)) return obj[k];
-  }
-  return undefined;
-}
-
 async function loadChart(){
   try{
     const res = await fetch("data/realized-price.json", { cache: "no-store" });
     if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
 
     const rows = await res.json();
-    if (!Array.isArray(rows) || rows.length === 0){
-      throw new Error("JSON is empty or invalid");
-    }
+    if (!Array.isArray(rows) || rows.length === 0) throw new Error("JSON is empty or invalid");
 
     const dates = [];
     const realized = [];
     const price = [];
 
     for (const r of rows){
-      const d = pick(r, ["date", "Date"]);
-      const rp = toNum(pick(r, ["realized_price", "realizedPrice", "realized", "value"]));
-      const p  = toNum(pick(r, ["price", "Price", "btc_price", "price_usd"]));
+      const d = r?.date;
+      const rp = toNum(r?.realized_price);
+      const px = toNum(r?.price);
 
       if (!d || rp === null) continue;
 
       dates.push(String(d));
       realized.push(rp);
-      price.push(p);
-    }
-
-    if (dates.length === 0){
-      throw new Error("No usable datapoints found");
+      price.push(px); // can be null, Plotly can handle gaps
     }
 
     const realizedTrace = {
@@ -73,11 +60,7 @@ async function loadChart(){
       type: "scatter",
       mode: "lines",
       name: "Realized Price",
-      yaxis: "y",
-      line: {
-        color: "#1f77b4",
-        width: 2
-      },
+      line: { width: 2 },
       hovertemplate: "Realized Price: $%{y:,.0f}<br>%{x}<extra></extra>"
     };
 
@@ -90,11 +73,7 @@ async function loadChart(){
         type: "scatter",
         mode: "lines",
         name: "BTC Price",
-        yaxis: "y",
-        line: {
-          color: "#000000",   // BLACK BTC PRICE LINE
-          width: 2
-        },
+        line: { width: 2, color: "#000000" },  // BLACK LINE
         connectgaps: true,
         hovertemplate: "BTC Price: $%{y:,.0f}<br>%{x}<extra></extra>"
       });
@@ -104,24 +83,17 @@ async function loadChart(){
       paper_bgcolor: "#ffffff",
       plot_bgcolor: "#ffffff",
       margin: { l: 80, r: 30, t: 20, b: 60 },
-      xaxis: {
-        type: "date",
-        showgrid: false,
-        tickfont: { color: "#111" }
-      },
+      xaxis: { type: "date", showgrid: false },
       yaxis: {
         type: "log",
+        dtick: 1,
         tickprefix: "$",
         tickformat: ",",
-        gridcolor: "#eee",
-        zeroline: false,
-        tickfont: { color: "#111" }
+        showgrid: true,
+        gridcolor: "#e6e6e6",
+        zeroline: false
       },
-      legend: {
-        orientation: "h",
-        x: 0.02,
-        y: 1.02
-      }
+      legend: { orientation: "h", x: 0.02, y: 1.02 }
     };
 
     Plotly.newPlot("chart", traces, layout, {
