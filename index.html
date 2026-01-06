@@ -43,7 +43,7 @@ async function loadChart(){
     const price = [];
 
     for (const r of rows){
-      const d = r?.date;
+      const d  = r?.date;
       const rp = toNum(r?.realized_price);
       const px = toNum(r?.price);
 
@@ -51,20 +51,20 @@ async function loadChart(){
 
       dates.push(String(d));
       realized.push(rp);
-      price.push(px); // can be null, Plotly can handle gaps
+      price.push(px);
     }
 
-    const realizedTrace = {
-      x: dates,
-      y: realized,
-      type: "scatter",
-      mode: "lines",
-      name: "Realized Price",
-      line: { width: 2 },
-      hovertemplate: "Realized Price: $%{y:,.0f}<br>%{x}<extra></extra>"
-    };
-
-    const traces = [realizedTrace];
+    const traces = [
+      {
+        x: dates,
+        y: realized,
+        type: "scatter",
+        mode: "lines",
+        name: "Realized Price",
+        line: { width: 2 },
+        hovertemplate: "Realized Price: $%{y:,.0f}<br>%{x}<extra></extra>"
+      }
+    ];
 
     if (price.some(v => v !== null)){
       traces.push({
@@ -73,7 +73,7 @@ async function loadChart(){
         type: "scatter",
         mode: "lines",
         name: "BTC Price",
-        line: { width: 2, color: "#000000" },  // BLACK LINE
+        line: { width: 2, color: "#000000" },
         connectgaps: true,
         hovertemplate: "BTC Price: $%{y:,.0f}<br>%{x}<extra></extra>"
       });
@@ -82,8 +82,13 @@ async function loadChart(){
     const layout = {
       paper_bgcolor: "#ffffff",
       plot_bgcolor: "#ffffff",
-      margin: { l: 80, r: 30, t: 20, b: 60 },
-      xaxis: { type: "date", showgrid: false },
+      margin: { l: 80, r: 30, t: 30, b: 60 },
+
+      xaxis: {
+        type: "date",
+        showgrid: false
+      },
+
       yaxis: {
         type: "log",
         dtick: 1,
@@ -93,7 +98,44 @@ async function loadChart(){
         gridcolor: "#e6e6e6",
         zeroline: false
       },
-      legend: { orientation: "h", x: 0.02, y: 1.02 }
+
+      /* 🔹 CENTER WATERMARK */
+      images: [
+        {
+          source: "assets/tbl-logo.png",
+          xref: "paper",
+          yref: "paper",
+          x: 0.5,
+          y: 0.5,
+          sizex: 0.6,
+          sizey: 0.6,
+          xanchor: "center",
+          yanchor: "middle",
+          opacity: 0.06,
+          layer: "below"
+        }
+      ],
+
+      /* 🔹 BRAND LABEL */
+      annotations: [
+        {
+          xref: "paper",
+          yref: "paper",
+          x: 0.02,
+          y: 0.98,
+          xanchor: "left",
+          yanchor: "top",
+          text: "Charts by: @TheBitcoinLayer",
+          showarrow: false,
+          font: { size: 14, color: "#111" },
+          bgcolor: "rgba(255,255,255,0.7)",
+          bordercolor: "rgba(0,0,0,0.15)",
+          borderwidth: 1,
+          borderpad: 6
+        }
+      ],
+
+      legend: { orientation: "h", x: 0.02, y: 1.05 }
     };
 
     Plotly.newPlot("chart", traces, layout, {
@@ -104,7 +146,7 @@ async function loadChart(){
   } catch (err){
     console.error(err);
     document.getElementById("chart").innerHTML =
-      "<p style='color:red;padding:20px;'>Error loading chart</p>";
+      "<p style='color:#cf222e;padding:20px;'>Error loading chart</p>";
   }
 }
 
