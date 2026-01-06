@@ -2,18 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bitcoin Realized Price</title>
 
   <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
 
   <style>
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #ffffff;
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      background:#ffffff;
+      color:#111;
     }
-    #chart {
-      width: 100vw;
-      height: 100vh;
+    #chart{
+      width:100vw;
+      height:100vh;
     }
   </style>
 </head>
@@ -22,67 +25,114 @@
 <div id="chart"></div>
 
 <script>
-async function loadChart() {
-  try {
-    const response = await fetch("data/realized-price.json");
-    const data = await response.json();
+function toNum(x){
+  const n = Number(x);
+  return Number.isFinite(n) ? n : null;
+}
 
-    if (!Array.isArray(data) || data.length === 0) {
-      throw new Error("No valid data loaded");
+function pick(obj, keys){
+  for (const k of keys){
+    if (obj && Object.prototype.hasOwnProperty.call(obj, k)) return obj[k];
+  }
+  return undefined;
+}
+
+async function loadChart(){
+  try{
+    const res = await fetch("data/realized-price.json", { cache: "no-store" });
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+
+    const rows = await res.json();
+    if (!Array.isArray(rows) || rows.length === 0){
+      throw new Error("JSON is empty or invalid");
     }
 
-    const dates = data.map(d => d.date);
-    const values = data.map(d => d.value);
+    const dates = [];
+    const realized = [];
+    const price = [];
 
-    const trace = {
+    for (const r of rows){
+      const d = pick(r, ["date", "Date"]);
+      const rp = toNum(pick(r, ["realized_price", "realizedPrice", "realized", "value"]));
+      const p  = toNum(pick(r, ["price", "Price", "btc_price", "price_usd"]));
+
+      if (!d || rp === null) continue;
+
+      dates.push(String(d));
+      realized.push(rp);
+      price.push(p);
+    }
+
+    if (dates.length === 0){
+      throw new Error("No usable datapoints found");
+    }
+
+    const realizedTrace = {
       x: dates,
-      y: values,
+      y: realized,
       type: "scatter",
       mode: "lines",
+      name: "Realized Price",
+      yaxis: "y",
       line: {
         color: "#1f77b4",
         width: 2
       },
-      hovertemplate: "$%{y:,.0f}<br>%{x}<extra></extra>"
+      hovertemplate: "Realized Price: $%{y:,.0f}<br>%{x}<extra></extra>"
     };
 
+    const traces = [realizedTrace];
+
+    if (price.some(v => v !== null)){
+      traces.push({
+        x: dates,
+        y: price,
+        type: "scatter",
+        mode: "lines",
+        name: "BTC Price",
+        yaxis: "y",
+        line: {
+          color: "#000000",   // BLACK BTC PRICE LINE
+          width: 2
+        },
+        connectgaps: true,
+        hovertemplate: "BTC Price: $%{y:,.0f}<br>%{x}<extra></extra>"
+      });
+    }
+
     const layout = {
+      paper_bgcolor: "#ffffff",
+      plot_bgcolor: "#ffffff",
+      margin: { l: 80, r: 30, t: 20, b: 60 },
       xaxis: {
-        title: "Date",
+        type: "date",
         showgrid: false,
-        tickfont: { color: "#111111" },
-        titlefont: { color: "#111111" }
+        tickfont: { color: "#111" }
       },
       yaxis: {
-        title: "USD",
         type: "log",
-        dtick: 1,
         tickprefix: "$",
         tickformat: ",",
-        showgrid: true,
-        gridcolor: "#e6e6e6",
-        tickfont: { color: "#111111" },
-        titlefont: { color: "#111111" }
+        gridcolor: "#eee",
+        zeroline: false,
+        tickfont: { color: "#111" }
       },
-      plot_bgcolor: "#ffffff",
-      paper_bgcolor: "#ffffff",
-      margin: {
-        l: 80,
-        r: 30,
-        t: 30,
-        b: 60
+      legend: {
+        orientation: "h",
+        x: 0.02,
+        y: 1.02
       }
     };
 
-    Plotly.newPlot("chart", [trace], layout, {
+    Plotly.newPlot("chart", traces, layout, {
       responsive: true,
       displaylogo: false
     });
 
-  } catch (err) {
-    document.getElementById("chart").innerHTML =
-      "<p style='color:red;padding:20px;'>Error loading chart data</p>";
+  } catch (err){
     console.error(err);
+    document.getElementById("chart").innerHTML =
+      "<p style='color:red;padding:20px;'>Error loading chart</p>";
   }
 }
 
