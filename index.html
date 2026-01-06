@@ -36,11 +36,9 @@ async function loadChart(){
     if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
 
     const rows = await res.json();
-    if (!Array.isArray(rows) || rows.length === 0) {
-      throw new Error("JSON is empty or invalid");
-    }
+    if (!Array.isArray(rows) || rows.length === 0) throw new Error("JSON is empty or invalid");
 
-    // ---- Trailing 3 years ----
+    // ---- Trailing 3 years only ----
     const cutoff = new Date();
     cutoff.setFullYear(cutoff.getFullYear() - 3);
 
@@ -74,31 +72,36 @@ async function loadChart(){
         name: "Realized Price",
         line: { width: 2, color: "#1f77b4" },
         hovertemplate: "Realized Price: $%{y:,.0f}<br>%{x}<extra></extra>"
-      },
-      {
+      }
+    ];
+
+    if (price.some(v => v !== null)){
+      traces.push({
         x: dates,
         y: price,
         type: "scatter",
         mode: "lines",
         name: "BTC Price",
+        yaxis: "y2",
         line: { width: 2, color: "#000000" },
         connectgaps: true,
         hovertemplate: "BTC Price: $%{y:,.0f}<br>%{x}<extra></extra>"
-      }
-    ];
+      });
+    }
 
     const layout = {
       paper_bgcolor: "#ffffff",
       plot_bgcolor: "#ffffff",
-      margin: { l: 90, r: 30, t: 30, b: 60 },
+      margin: { l: 90, r: 90, t: 30, b: 60 },
 
       xaxis: {
         type: "date",
         showgrid: false
       },
 
+      // LEFT AXIS: Realized Price
       yaxis: {
-        title: "USD (log scale)",
+        title: "Realized Price (USD)",
         type: "log",
         dtick: 1,
         tickprefix: "$",
@@ -108,7 +111,72 @@ async function loadChart(){
         zeroline: false
       },
 
-      /* WATERMARK */
+      // RIGHT AXIS: BTC Price
+      yaxis2: {
+        title: "BTC Price (USD)",
+        overlaying: "y",
+        side: "right",
+        type: "log",
+        dtick: 1,
+        tickprefix: "$",
+        tickformat: ",",
+        showgrid: false,
+        zeroline: false
+      },
+
+      /* CENTER WATERMARK */
       images: [
         {
           source: "assets/tbl-logo.png",
+          xref: "paper",
+          yref: "paper",
+          x: 0.5,
+          y: 0.5,
+          sizex: 0.6,
+          sizey: 0.6,
+          xanchor: "center",
+          yanchor: "middle",
+          opacity: 0.06,
+          layer: "below"
+        }
+      ],
+
+      /* BRAND LABEL */
+      annotations: [
+        {
+          xref: "paper",
+          yref: "paper",
+          x: 0.05,
+          y: 0.93,
+          xanchor: "left",
+          yanchor: "top",
+          text: "Charts by: @TheBitcoinLayer",
+          showarrow: false,
+          font: { size: 14, color: "#111" },
+          bgcolor: "rgba(255,255,255,0.7)",
+          bordercolor: "rgba(0,0,0,0.15)",
+          borderwidth: 1,
+          borderpad: 6
+        }
+      ],
+
+      legend: { orientation: "h", x: 0.02, y: 1.05 }
+    };
+
+    Plotly.newPlot("chart", traces, layout, {
+      responsive: true,
+      displaylogo: false
+    });
+
+  } catch (err){
+    console.error(err);
+    document.getElementById("chart").innerHTML =
+      "<p style='color:#cf222e;padding:20px;'>Error loading chart</p>";
+  }
+}
+
+loadChart();
+</script>
+
+</body>
+</html>
