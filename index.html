@@ -38,21 +38,22 @@ async function loadChart(){
     const rows = await res.json();
     if (!Array.isArray(rows) || rows.length === 0) throw new Error("JSON is empty or invalid");
 
-    // ---- Trailing 3 years only ----
+    // ---- Trailing 3 years only (ONLY CHANGE) ----
     const cutoff = new Date();
     cutoff.setFullYear(cutoff.getFullYear() - 3);
 
     const filtered = rows.filter(r => {
-      const d = new Date(r.date);
+      const d = new Date(r?.date);
       return Number.isFinite(d.getTime()) && d >= cutoff;
     });
+    // --------------------------------------------
 
     const dates = [];
     const realized = [];
     const price = [];
 
     for (const r of filtered){
-      const d  = r?.date;
+      const d = r?.date;
       const rp = toNum(r?.realized_price);
       const px = toNum(r?.price);
 
@@ -70,7 +71,7 @@ async function loadChart(){
         type: "scatter",
         mode: "lines",
         name: "Realized Price",
-        line: { width: 2, color: "#1f77b4" },
+        line: { width: 2 },
         hovertemplate: "Realized Price: $%{y:,.0f}<br>%{x}<extra></extra>"
       }
     ];
@@ -82,7 +83,6 @@ async function loadChart(){
         type: "scatter",
         mode: "lines",
         name: "BTC Price",
-        yaxis: "y2",
         line: { width: 2, color: "#000000" },
         connectgaps: true,
         hovertemplate: "BTC Price: $%{y:,.0f}<br>%{x}<extra></extra>"
@@ -92,16 +92,14 @@ async function loadChart(){
     const layout = {
       paper_bgcolor: "#ffffff",
       plot_bgcolor: "#ffffff",
-      margin: { l: 90, r: 90, t: 30, b: 60 },
+      margin: { l: 80, r: 30, t: 30, b: 60 },
 
       xaxis: {
         type: "date",
         showgrid: false
       },
 
-      // LEFT AXIS: Realized Price
       yaxis: {
-        title: "Realized Price (USD)",
         type: "log",
         dtick: 1,
         tickprefix: "$",
@@ -111,20 +109,7 @@ async function loadChart(){
         zeroline: false
       },
 
-      // RIGHT AXIS: BTC Price
-      yaxis2: {
-        title: "BTC Price (USD)",
-        overlaying: "y",
-        side: "right",
-        type: "log",
-        dtick: 1,
-        tickprefix: "$",
-        tickformat: ",",
-        showgrid: false,
-        zeroline: false
-      },
-
-      /* CENTER WATERMARK */
+      /* 🔹 CENTER WATERMARK */
       images: [
         {
           source: "assets/tbl-logo.png",
@@ -141,13 +126,13 @@ async function loadChart(){
         }
       ],
 
-      /* BRAND LABEL */
+      /* 🔹 BRAND LABEL */
       annotations: [
         {
           xref: "paper",
           yref: "paper",
-          x: 0.05,
-          y: 0.93,
+          x: 0.04,
+          y: 0.94,
           xanchor: "left",
           yanchor: "top",
           text: "Charts by: @TheBitcoinLayer",
