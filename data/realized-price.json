@@ -29061,362 +29061,402 @@
   },
   {
     "date": "2026-07-17",
-    "realized_price": 52867.81050541873,
+    "realized_price": 52880.75036326946,
     "price": 63899.0
   },
   {
     "date": "2026-07-18",
-    "realized_price": 52855.93199292908,
+    "realized_price": 52877.92026207517,
     "price": 64796.0
   },
   {
     "date": "2026-07-19",
-    "realized_price": 52928.588601737785,
+    "realized_price": 52883.54115402328,
     "price": 64679.0
   },
   {
     "date": "2026-07-20",
-    "realized_price": 52869.439052436246,
+    "realized_price": 52892.120687908224,
     "price": 65203.0
   },
   {
+    "date": "2026-07-21",
+    "realized_price": 52913.20778761797,
+    "price": 66516.0
+  },
+  {
     "date": "2026-07-22",
-    "realized_price": 52963.85172394157,
+    "realized_price": 52906.81556052721,
     "price": 66073.0
   },
   {
+    "date": "2026-07-23",
+    "realized_price": 52900.05080850953,
+    "price": 65053.0
+  },
+  {
     "date": "2026-07-24",
-    "realized_price": 53153.360726501254,
+    "realized_price": 52884.27881430897,
     "price": 64096.0
   },
   {
     "date": "2026-07-25",
-    "realized_price": 53356.84612546127,
+    "realized_price": 52905.401650557775,
     "price": 64321.0
   },
   {
     "date": "2026-07-26",
-    "realized_price": 53380.44285728902,
+    "realized_price": 52905.71545381298,
     "price": 65334.0
   },
   {
     "date": "2026-07-27",
-    "realized_price": 53441.50862186955,
+    "realized_price": 52899.27156764035,
     "price": 63701.0
   },
   {
     "date": "2026-07-28",
-    "realized_price": 53441.1710955905,
+    "realized_price": 52888.39800550716,
     "price": 63875.0
   },
   {
     "date": "2026-07-29",
-    "realized_price": 53684.390811702186,
+    "realized_price": 52886.42516406934,
     "price": 63916.0
   },
   {
     "date": "2026-07-30",
-    "realized_price": 53927.12687772454,
+    "realized_price": 52882.756525699006,
     "price": 64734.0
   },
   {
     "date": "2026-07-31",
-    "realized_price": 53920.99538085659,
+    "realized_price": 52865.73230704076,
     "price": 62820.0
   },
   {
     "date": "2026-08-01",
-    "realized_price": 53876.66866953505,
+    "realized_price": 52816.11517212119,
     "price": 62773.0
   },
   {
     "date": "2026-08-02",
-    "realized_price": 53886.49854173838,
+    "realized_price": 52813.09512546385,
     "price": 63501.0
   },
   {
     "date": "2026-08-03",
-    "realized_price": 53861.98998703467,
+    "realized_price": 52784.404868345584,
     "price": 63465.0
   },
   {
     "date": "2026-08-04",
-    "realized_price": 53870.013068010274,
+    "realized_price": 52777.31378979308,
     "price": 64063.0
   },
   {
     "date": "2026-08-05",
-    "realized_price": 53860.44439987754,
+    "realized_price": 52759.93003594164,
     "price": 64603.0
   },
   {
     "date": "2026-08-06",
-    "realized_price": 54004.844728179734,
+    "realized_price": 52763.796837795024,
     "price": 64261.0
   },
   {
     "date": "2026-08-07",
-    "realized_price": 54009.4959496912,
+    "realized_price": 52753.44032480373,
     "price": 64884.0
   },
   {
     "date": "2026-08-08",
-    "realized_price": 54017.38876800212,
+    "realized_price": 52759.40971979477,
     "price": 64916.0
   },
   {
     "date": "2026-08-09",
-    "realized_price": 54015.42849940139,
+    "realized_price": 52755.43387932838,
     "price": 64856.0
   },
   {
     "date": "2026-08-10",
-    "realized_price": 54007.24372967912,
+    "realized_price": 52748.23934725846,
     "price": 63915.0
   },
   {
     "date": "2026-08-11",
-    "realized_price": 54002.43646036122,
+    "realized_price": 52736.81325353146,
     "price": 63550.0
   },
   {
+    "date": "2026-08-12",
+    "realized_price": 52717.334800186654,
+    "price": 63408.0
+  },
+  {
+    "date": "2026-08-13",
+    "realized_price": 52713.098896794174,
+    "price": 63426.0
+  },
+  {
     "date": "2026-08-14",
-    "realized_price": 54031.52434560027,
+    "realized_price": 52699.80226581918,
     "price": 62985.0
   },
   {
     "date": "2026-08-15",
-    "realized_price": 54222.567683810514,
+    "realized_price": 52698.6003534542,
     "price": 63030.0
   },
   {
     "date": "2026-08-16",
-    "realized_price": 54227.28900638759,
+    "realized_price": 52684.87876216511,
     "price": 62843.0
   },
   {
     "date": "2026-08-17",
-    "realized_price": 54400.5758551818,
+    "realized_price": 52681.67002761329,
     "price": 64483.0
   },
   {
     "date": "2026-08-18",
-    "realized_price": 54435.697285146394,
+    "realized_price": 52669.49082267861,
     "price": 64686.0
   },
   {
     "date": "2026-08-19",
-    "realized_price": 54487.44340793969,
+    "realized_price": 52672.56422527113,
     "price": 69291.0
   },
   {
     "date": "2026-08-20",
-    "realized_price": 54724.9651413724,
+    "realized_price": 52717.27233771315,
     "price": 73016.0
   },
   {
     "date": "2026-08-21",
-    "realized_price": 54921.28077058198,
+    "realized_price": 52803.97954494158,
     "price": 78320.0
   },
   {
     "date": "2026-08-22",
-    "realized_price": 54947.148580883026,
+    "realized_price": 52834.28867969051,
     "price": 77070.0
   },
   {
     "date": "2026-08-23",
-    "realized_price": 55108.9663240693,
+    "realized_price": 52846.26989741063,
     "price": 77702.0
   },
   {
     "date": "2026-08-24",
-    "realized_price": 55177.72815391219,
+    "realized_price": 52924.85022904798,
     "price": 78977.0
   },
   {
+    "date": "2026-08-25",
+    "realized_price": 52970.06131239816,
+    "price": 78500.0
+  },
+  {
+    "date": "2026-08-26",
+    "realized_price": 53003.12708211707,
+    "price": 79018.0
+  },
+  {
+    "date": "2026-08-27",
+    "realized_price": 53036.63979345003,
+    "price": 80262.0
+  },
+  {
+    "date": "2026-08-28",
+    "realized_price": 53057.77043015832,
+    "price": 77829.0
+  },
+  {
     "date": "2026-08-29",
-    "realized_price": 55394.803549412856,
+    "realized_price": 53058.57521040707,
     "price": 78228.0
   },
   {
     "date": "2026-08-30",
-    "realized_price": 55528.042724802915,
+    "realized_price": 53068.26072848807,
     "price": 77689.0
   },
   {
     "date": "2026-08-31",
-    "realized_price": 55820.61274264927,
+    "realized_price": 53085.80771295916,
     "price": 78547.0
   },
   {
     "date": "2026-09-01",
-    "realized_price": 56039.767457910086,
+    "realized_price": 53096.63091393398,
     "price": 77411.0
   },
   {
     "date": "2026-09-02",
-    "realized_price": 56120.182525254444,
+    "realized_price": 53100.842944155534,
     "price": 77297.0
   },
   {
     "date": "2026-09-03",
-    "realized_price": 56259.92379004744,
+    "realized_price": 53135.32728701198,
     "price": 81265.0
   },
   {
     "date": "2026-09-04",
-    "realized_price": 56384.797386962004,
+    "realized_price": 53153.02373963952,
     "price": 79671.0
   },
   {
     "date": "2026-09-05",
-    "realized_price": 56411.9330781051,
+    "realized_price": 53172.37349015357,
     "price": 79814.0
   },
   {
     "date": "2026-09-06",
-    "realized_price": 56444.25167091671,
+    "realized_price": 53185.77047938018,
     "price": 80341.0
   },
   {
     "date": "2026-09-07",
-    "realized_price": 56464.13864799841,
+    "realized_price": 53192.150574682506,
     "price": 79093.0
   },
   {
     "date": "2026-09-08",
-    "realized_price": 56500.31168450924,
+    "realized_price": 53201.29961023264,
     "price": 78446.0
   },
   {
     "date": "2026-09-09",
-    "realized_price": 56509.736162522786,
+    "realized_price": 53209.92911813487,
     "price": 78281.0
   },
   {
     "date": "2026-09-10",
-    "realized_price": 56820.691169925834,
+    "realized_price": 53221.781181673294,
     "price": 76555.0
   },
   {
     "date": "2026-09-11",
-    "realized_price": 56823.907480174246,
+    "realized_price": 53223.51984860069,
     "price": 77204.0
   },
   {
     "date": "2026-09-12",
-    "realized_price": 57113.11591366799,
+    "realized_price": 53227.79016314781,
     "price": 77274.0
   },
   {
     "date": "2026-09-13",
-    "realized_price": 57126.780880352526,
+    "realized_price": 53230.62518623467,
     "price": 76816.0
   },
   {
     "date": "2026-09-14",
-    "realized_price": 57380.12135087047,
+    "realized_price": 53240.4443018335,
     "price": 78177.0
   },
   {
     "date": "2026-09-15",
-    "realized_price": 57522.831414846296,
+    "realized_price": 53235.33057404149,
     "price": 75590.0
   },
   {
     "date": "2026-09-16",
-    "realized_price": 53203.52696418076,
+    "realized_price": 53225.29447419723,
     "price": 76149.0
   },
   {
     "date": "2026-09-17",
-    "realized_price": 53197.0271982997,
+    "realized_price": 53223.821292389584,
     "price": 76370.0
   },
   {
     "date": "2026-09-18",
-    "realized_price": 53243.65400493206,
+    "realized_price": 53257.84172159518,
     "price": 80871.0
   },
   {
     "date": "2026-09-19",
-    "realized_price": 53259.97032500163,
+    "realized_price": 53280.25023299047,
     "price": 81236.0
   },
   {
     "date": "2026-09-20",
-    "realized_price": 53266.56993695801,
+    "realized_price": 53285.74341861143,
     "price": 81158.0
   },
   {
     "date": "2026-09-21",
-    "realized_price": 53363.16115715892,
+    "realized_price": 53370.51642243309,
     "price": 86598.0
   },
   {
     "date": "2026-09-22",
-    "realized_price": 53468.55823713287,
+    "realized_price": 53483.24334875274,
     "price": 86189.0
   },
   {
     "date": "2026-09-23",
-    "realized_price": 53482.54100715648,
+    "realized_price": 53502.9364836685,
     "price": 84381.0
   },
   {
     "date": "2026-09-24",
-    "realized_price": 53496.34663609623,
+    "realized_price": 53516.49358255304,
     "price": 84379.0
   },
   {
     "date": "2026-09-25",
-    "realized_price": 53522.52239375708,
+    "realized_price": 53544.74201796282,
     "price": 84076.0
   },
   {
     "date": "2026-09-26",
-    "realized_price": 53532.63668507783,
+    "realized_price": 53553.86247403697,
     "price": 84420.0
   },
   {
     "date": "2026-09-27",
-    "realized_price": 53538.737167495165,
+    "realized_price": 53561.40505151919,
     "price": 84442.0
   },
   {
     "date": "2026-09-28",
-    "realized_price": 53572.084703357206,
+    "realized_price": 53591.80481359913,
     "price": 83484.0
   },
   {
     "date": "2026-09-29",
-    "realized_price": 53598.663051012874,
+    "realized_price": 53618.44162752805,
     "price": 83640.0
   },
   {
     "date": "2026-09-30",
-    "realized_price": 53605.60204443927,
+    "realized_price": 53624.9190553639,
     "price": 83578.0
   },
   {
     "date": "2026-10-01",
-    "realized_price": 52944.38341442124,
+    "realized_price": 53648.10849403215,
     "price": 84842.0
   },
   {
     "date": "2026-10-02",
-    "realized_price": 52686.10784708971,
+    "realized_price": 53698.08076898872,
     "price": 84504.0
   },
   {
     "date": "2026-10-03",
-    "realized_price": 52597.84254332214,
+    "realized_price": 53706.583838030456,
     "price": 84743.0
   },
   {
     "date": "2026-10-04",
-    "realized_price": 53699.99200326001,
+    "realized_price": 53724.68763717969,
     "price": 86515.0
   },
   {
@@ -29568,5 +29608,10 @@
     "date": "2026-11-03",
     "realized_price": 54010.68256406408,
     "price": 77384.0
+  },
+  {
+    "date": "2026-11-04",
+    "realized_price": 54026.40241550416,
+    "price": 80498.0
   }
 ]
